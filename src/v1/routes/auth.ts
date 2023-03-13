@@ -1,9 +1,10 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { body } from 'express-validator';
 
-import { UserModel } from '../models/user';
+import { UserModel, UserType } from '../models/user';
 import { validate } from '../middlewares/validation';
 import userController from '../controllers/user.controller';
+import { verifyToken } from '../middlewares/tokenHandler';
 
 export const router = Router();
 
@@ -32,3 +33,8 @@ router.post(
   validate,
   userController.login
 );
+
+// JWT認証API
+router.post('/verify-token', verifyToken, (req: Request<any, any, { user: UserType }>, res) => {
+  return res.status(200).json({ user: req.body.user });
+});
