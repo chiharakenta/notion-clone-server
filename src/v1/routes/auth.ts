@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 
 import { UserModel } from '../models/user';
 import { validate } from '../middlewares/validation';
-import userController from '../controllers/user';
+import userController from '../controllers/user.controller';
 
 export const router = Router();
 
@@ -25,3 +25,10 @@ router.post(
 );
 
 // ユーザーログインAPI
+router.post(
+  '/login',
+  body('username').isLength({ min: 8 }).withMessage('ユーザー名は8文字以上で入力してください。'),
+  body('password').isLength({ min: 8 }).withMessage('パスワードは8文字以上で入力してください。'),
+  validate,
+  userController.login
+);
