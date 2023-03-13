@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./dist/app.js",
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "build:production": "npm ci && vite build"
   },
   "keywords": [],
   "author": "",
