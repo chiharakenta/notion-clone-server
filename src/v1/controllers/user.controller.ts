@@ -1,16 +1,23 @@
+import { PrismaClient } from '@prisma/client';
 import { AES, enc } from 'crypto-js';
 import { Handler, Request } from 'express';
 import { sign } from 'jsonwebtoken';
 import { SECRET_KEY, TOKEN_SECRET_KEY } from '../constants/env';
-import { UserModel, UserType } from '../models/user';
+import { UserType } from '../types/user.type';
 
+const prisma = new PrismaClient();
 namespace userController {
   export const register: Handler = async (req: Request<any, any, UserType>, res) => {
     try {
       const { username, password } = req.body;
       const encryptedPassword = AES.encrypt(password, SECRET_KEY).toString();
-      const user = await UserModel.create<UserType>({ username, password: encryptedPassword });
-      const token = sign({ id: user._id }, TOKEN_SECRET_KEY, {
+      const user = await prisma.user.create({
+        data: {
+          username,
+          password: encryptedPassword
+        }
+      });
+      const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
       return res.status(201).json({ user, token });
@@ -24,7 +31,7 @@ namespace userController {
     const { username, password } = req.body;
     try {
       // DBからユーザーが存在するか探してくる
-      const user = await UserModel.findOne({ username });
+      const user = await prisma.user.findUnique({ where: { username } });
       if (!user) {
         return res.status(401).json({
           errors: {
@@ -46,7 +53,7 @@ namespace userController {
       }
 
       // JWTトークンを発行する
-      const token = sign({ id: user._id }, TOKEN_SECRET_KEY, {
+      const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
       return res.status(201).json({ user, token });

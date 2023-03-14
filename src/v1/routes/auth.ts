@@ -1,12 +1,15 @@
 import { Router, Request } from 'express';
 import { body } from 'express-validator';
 
-import { UserModel, UserType } from '../models/user';
+import { UserType } from '../types/user.type';
 import { validate } from '../middlewares/validation';
 import userController from '../controllers/user.controller';
 import { verifyToken } from '../middlewares/tokenHandler';
+import { PrismaClient } from '@prisma/client';
 
 export const router = Router();
+
+const prisma = new PrismaClient();
 
 // ユーザー新規登録API
 router.post(
@@ -17,9 +20,15 @@ router.post(
     .isLength({ min: 8 })
     .withMessage('確認用パスワードは8文字以上で入力してください。'),
   body('username').custom((value) => {
-    return UserModel.findOne({ username: value }).then((user) => {
-      if (user) return Promise.reject('このユーザー名は既に使われています。');
-    });
+    return prisma.user
+      .findUnique({
+        where: {
+          username: value
+        }
+      })
+      .then((user) => {
+        if (user) return Promise.reject('このユーザー名は既に使われています。');
+      });
   }),
   validate,
   userController.register

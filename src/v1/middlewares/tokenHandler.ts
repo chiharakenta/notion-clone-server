@@ -1,8 +1,10 @@
+import { PrismaClient } from '@prisma/client';
 import { Handler } from 'express';
 import { IncomingHttpHeaders } from 'http';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { TOKEN_SECRET_KEY } from '../constants/env';
-import { UserModel } from '../models/user';
+
+const prisma = new PrismaClient();
 
 // クライアントから渡されたJWTが正常か検証
 export const tokenDecode = (requestHeaders: IncomingHttpHeaders) => {
@@ -25,7 +27,11 @@ export const verifyToken: Handler = async (req, res, next) => {
     return res.status(401).json('権限がありません。');
   }
   // そのJWTと一致するユーザーを探してくる
-  const user = await UserModel.findById(decodedToken.id);
+  const user = await prisma.user.findUnique({
+    where: {
+      id: decodedToken.id
+    }
+  });
   if (!user) {
     return res.status(401).json('権限がありません。');
   }
