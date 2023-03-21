@@ -7,12 +7,12 @@ import userController from '../controllers/user.controller';
 import { verifyToken } from '../middlewares/tokenHandler';
 import { PrismaClient } from '@prisma/client';
 
-export const router = Router();
+export const authRouter = Router();
 
 const prisma = new PrismaClient();
 
 // ユーザー新規登録API
-router.post(
+authRouter.post(
   '/register',
   body('username').isLength({ min: 8 }).withMessage('ユーザー名は8文字以上で入力してください。'),
   body('password').isLength({ min: 8 }).withMessage('パスワードは8文字以上で入力してください。'),
@@ -35,7 +35,7 @@ router.post(
 );
 
 // ユーザーログインAPI
-router.post(
+authRouter.post(
   '/login',
   body('username').isLength({ min: 8 }).withMessage('ユーザー名は8文字以上で入力してください。'),
   body('password').isLength({ min: 8 }).withMessage('パスワードは8文字以上で入力してください。'),
@@ -44,6 +44,6 @@ router.post(
 );
 
 // JWT認証API
-router.post('/verify-token', verifyToken, (req: Request<any, any, { user: UserType }>, res) => {
+authRouter.post('/verify-token', verifyToken, (req: Request<any, any, { user: UserType }>, res) => {
   return res.status(200).json({ user: req.body.user });
 });
