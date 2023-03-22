@@ -34,10 +34,12 @@ namespace userController {
       const user = await prisma.user.findUnique({ where: { username } });
       if (!user) {
         return res.status(401).json({
-          errors: {
-            param: 'username',
-            message: 'ユーザー名が無効です。'
-          }
+          errors: [
+            {
+              param: 'username',
+              msg: 'ユーザー名が無効です。'
+            }
+          ]
         });
       }
 
@@ -45,10 +47,12 @@ namespace userController {
       const decryptedPassword = AES.decrypt(user.password, SECRET_KEY).toString(enc.Utf8);
       if (decryptedPassword !== password) {
         return res.status(401).json({
-          errors: {
-            param: 'password',
-            message: 'パスワードが無効です。'
-          }
+          errors: [
+            {
+              param: 'password',
+              msg: 'パスワードが無効です。'
+            }
+          ]
         });
       }
 
