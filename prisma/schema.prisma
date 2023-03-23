@@ -14,4 +14,17 @@ model User {
   id Int @id @default(autoincrement())
   username String @unique
   password String
+  memos Memo[]
+}
+
+model Memo {
+  id Int @id @default(autoincrement())
+  icon String @default("📝")
+  title String @default("無題")
+  description String @default("ここに自由に記入してください。")
+  position Int
+  favorite Boolean @default(false)
+  favoritePosition Int @default(0)
+  user User @relation(fields: [userId], references: [id])
+  userId  Int
 }
