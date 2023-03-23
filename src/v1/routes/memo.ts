@@ -6,3 +6,6 @@ export const memoRouter = Router();
 
 // メモを作成
 memoRouter.post('/', verifyToken, memoController.create);
+
+// ログイン中のユーザーが投稿したメモをすべて取得
+memoRouter.get('/', verifyToken, memoController.getAll);
