@@ -9,3 +9,6 @@ memoRouter.post('/', verifyToken, memoController.create);
 
 // ログイン中のユーザーが投稿したメモをすべて取得
 memoRouter.get('/', verifyToken, memoController.getAll);
+
+// ログイン中のユーザーが投稿したメモを1つ取得
+memoRouter.get('/:memoId', verifyToken, memoController.getOne);
