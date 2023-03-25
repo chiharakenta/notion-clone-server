@@ -11,3 +11,15 @@ export type MemoModel = {
   user?: UserModel;
   userId: number;
 };
+
+export type MemoType = {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+  position: number;
+  favorite: boolean;
+  favoritePosition: number;
+  user: UserModel;
+  userId: number;
+};

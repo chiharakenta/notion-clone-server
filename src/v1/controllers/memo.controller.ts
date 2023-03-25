@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Handler, Request } from 'express';
+import { MemoType } from '../types/memo.type';
 import { UserModel, VerifiedUser } from '../types/user.type';
 
 const prisma = new PrismaClient();
@@ -39,6 +40,42 @@ export namespace memoController {
         return res.status(404).json('権限がありません。');
       }
       return res.status(200).json({ memo });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  };
+
+  export const update = async (
+    req: Request<
+      { memoId: string },
+      any,
+      { user: VerifiedUser; title: MemoType['title']; description: MemoType['description'] }
+    >,
+    res
+  ) => {
+    try {
+      const { user, title, description } = req.body;
+      const memo = await prisma.memo.findUnique({
+        where: {
+          id: parseInt(req.params.memoId)
+        }
+      });
+      if (!memo) {
+        return res.status(404).json('メモが存在しません。');
+      }
+      if (memo.userId !== user.id) {
+        return res.status(404).json('権限がありません。');
+      }
+      const updatedMemo = await prisma.memo.update({
+        where: {
+          id: parseInt(req.params.memoId)
+        },
+        data: {
+          title: title || '無題',
+          description: description || 'ここに自由に記入してください。'
+        }
+      });
+      return res.status(200).json({ memo: updatedMemo });
     } catch (error) {
       return res.status(500).json(error);
     }
