@@ -103,4 +103,30 @@ export namespace memoController {
       return res.status(500).json(error);
     }
   };
+  export const destroy = async (
+    req: Request<{ memoId: string }, any, { user: VerifiedUser }>,
+    res
+  ) => {
+    try {
+      const memo = await prisma.memo.findUnique({
+        where: {
+          id: parseInt(req.params.memoId)
+        }
+      });
+      if (!memo) {
+        return res.status(404).json('メモが存在しません。');
+      }
+      if (memo.userId !== req.body.user.id) {
+        return res.status(404).json('権限がありません。');
+      }
+      await prisma.memo.delete({
+        where: {
+          id: parseInt(req.params.memoId)
+        }
+      });
+      return res.status(200).json('メモを削除しました。');
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  };
 }

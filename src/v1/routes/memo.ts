@@ -15,3 +15,6 @@ memoRouter.get('/:memoId', verifyToken, memoController.getOne);
 
 // ログイン中のユーザーが投稿したメモを更新
 memoRouter.put('/:memoId', verifyToken, memoController.update);
+
+// ログイン中のユーザーが投稿したメモを削除
+memoRouter.delete('/:memoId', verifyToken, memoController.destroy);
