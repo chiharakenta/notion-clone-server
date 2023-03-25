@@ -71,8 +71,8 @@ export namespace memoController {
           id: parseInt(req.params.memoId)
         },
         data: {
-          title: title || '無題',
-          description: description || 'ここに自由に記入してください。'
+          title: title || memo.title || '無題',
+          description: description || memo.description || 'ここに自由に記入してください。'
         }
       });
       return res.status(200).json({ memo: updatedMemo });
