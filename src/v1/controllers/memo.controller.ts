@@ -49,12 +49,17 @@ export namespace memoController {
     req: Request<
       { memoId: string },
       any,
-      { user: VerifiedUser; title: MemoType['title']; description: MemoType['description'] }
+      {
+        user: VerifiedUser;
+        title: MemoType['title'];
+        description: MemoType['description'];
+        icon: MemoType['icon'];
+      }
     >,
     res
   ) => {
     try {
-      const { user, title, description } = req.body;
+      const { user, title, description, icon } = req.body;
       const memo = await prisma.memo.findUnique({
         where: {
           id: parseInt(req.params.memoId)
@@ -72,7 +77,8 @@ export namespace memoController {
         },
         data: {
           title: title || memo.title || '無題',
-          description: description || memo.description || 'ここに自由に記入してください。'
+          description: description || memo.description || 'ここに自由に記入してください。',
+          icon: icon || memo.icon
         }
       });
       return res.status(200).json({ memo: updatedMemo });
