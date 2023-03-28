@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
@@ -9,11 +10,13 @@ import cors from 'cors';
 const app = express();
 app.use(
   cors({
-    origin: CORS_ORIGIN
+    origin: CORS_ORIGIN,
+    credentials: true
   })
 );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use('/api/v1', router);
 
 if (NODE_ENV === 'production') {

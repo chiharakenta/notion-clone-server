@@ -43,6 +43,8 @@ authRouter.post(
   userController.login
 );
 
+authRouter.delete('/logout', userController.logout);
+
 // JWT認証API
 authRouter.post('/verify-token', verifyToken, (req: Request<any, any, { user: UserType }>, res) => {
   return res.status(200).json({ user: req.body.user });

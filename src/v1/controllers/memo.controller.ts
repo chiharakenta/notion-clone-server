@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Handler, Request } from 'express';
 import { MemoType } from '../types/memo.type';
-import { UserModel, VerifiedUser } from '../types/user.type';
+import { VerifiedUser } from '../types/user.type';
 
 const prisma = new PrismaClient();
 

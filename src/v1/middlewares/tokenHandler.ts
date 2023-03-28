@@ -7,13 +7,9 @@ import { TOKEN_SECRET_KEY } from '../constants/env';
 const prisma = new PrismaClient();
 
 // クライアントから渡されたJWTが正常か検証
-export const tokenDecode = (requestHeaders: IncomingHttpHeaders) => {
-  const bearerHeader = requestHeaders['authorization'];
-  if (!bearerHeader) return false;
-
-  const bearer = bearerHeader.split(' ')[1];
+export const tokenDecode = (accessToken: string) => {
   try {
-    const decodedToken = verify(bearer, TOKEN_SECRET_KEY) as JwtPayload;
+    const decodedToken = verify(accessToken, TOKEN_SECRET_KEY) as JwtPayload;
     return decodedToken;
   } catch (error) {
     return false;
@@ -22,7 +18,8 @@ export const tokenDecode = (requestHeaders: IncomingHttpHeaders) => {
 
 // JWT認証を検証するためのミドルウェア
 export const verifyToken: Handler = async (req, res, next) => {
-  const decodedToken = tokenDecode(req.headers);
+  const accessToken = req.cookies.access_token as string;
+  const decodedToken = tokenDecode(accessToken);
   if (!decodedToken) {
     return res.status(401).json('権限がありません。');
   }

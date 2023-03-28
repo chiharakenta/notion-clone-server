@@ -20,7 +20,13 @@ namespace userController {
       const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
-      return res.status(201).json({ user, token });
+      return res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production'
+        })
+        .status(201)
+        .json({ user });
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -60,10 +66,21 @@ namespace userController {
       const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
-      return res.status(201).json({ user, token });
+      return res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production'
+        })
+        .status(201)
+        .json({ user });
     } catch (error) {
       return res.status(500).json(error);
     }
+  };
+
+  // ユーザーログアウトAPI
+  export const logout: Handler = async (req, res) => {
+    res.clearCookie('access_token').status(204).json();
   };
 }
 
