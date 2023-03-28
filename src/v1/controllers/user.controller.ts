@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { AES, enc } from 'crypto-js';
 import { Handler, Request } from 'express';
 import { sign } from 'jsonwebtoken';
-import { SECRET_KEY, TOKEN_SECRET_KEY } from '../constants/env';
+import { NODE_ENV, SECRET_KEY, TOKEN_SECRET_KEY } from '../constants/env';
 import { UserType } from '../types/user.type';
 
 const prisma = new PrismaClient();
@@ -23,7 +23,7 @@ namespace userController {
       return res
         .cookie('access_token', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production'
+          secure: NODE_ENV === 'production'
         })
         .status(201)
         .json({ user });
@@ -69,7 +69,7 @@ namespace userController {
       return res
         .cookie('access_token', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production'
+          secure: NODE_ENV === 'production'
         })
         .status(201)
         .json({ user });
