@@ -45,6 +45,29 @@ export namespace memoController {
     }
   };
 
+  export const create: Handler = async (req: Request<any, any, { user: VerifiedUser }>, res) => {
+    try {
+      const userId = req.body.user.id;
+      const memoCount = (
+        await prisma.memo.findMany({
+          where: {
+            userId
+          }
+        })
+      ).length;
+      // メモ新規作成
+      const memo = await prisma.memo.create({
+        data: {
+          userId,
+          position: memoCount ? memoCount : 0
+        }
+      });
+      return res.status(200).json({ memo });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  };
+
   export const update = async (
     req: Request<
       { memoId: string },
@@ -87,28 +110,62 @@ export namespace memoController {
     }
   };
 
-  export const create: Handler = async (req: Request<any, any, { user: VerifiedUser }>, res) => {
+  export const updatePosition = async (
+    req: Request<
+      any,
+      any,
+      {
+        user: VerifiedUser;
+        memos: [MemoType, MemoType];
+      }
+    >,
+    res
+  ) => {
     try {
-      const userId = req.body.user.id;
-      const memoCount = (
-        await prisma.memo.findMany({
-          where: {
-            userId
-          }
-        })
-      ).length;
-      // メモ新規作成
-      const memo = await prisma.memo.create({
-        data: {
-          userId,
-          position: memoCount ? memoCount : 0
+      const { user, memos } = req.body;
+      const targetMemos = await prisma.memo.findMany({
+        where: {
+          OR: [
+            {
+              userId: user.id,
+              id: memos[0].id
+            },
+            {
+              userId: user.id,
+              id: memos[1].id
+            }
+          ]
         }
       });
-      return res.status(200).json({ memo });
+      if (targetMemos.length < 2) {
+        return res.status(404).json({
+          message: '更新対象のメモが２つ見つかりません。',
+          memos: targetMemos
+        });
+      }
+
+      await prisma.$transaction(
+        memos.map((memo) =>
+          prisma.memo.update({
+            where: {
+              id: memo.id
+            },
+            data: {
+              position: memo.position
+            }
+          })
+        )
+      );
+      const sortedMemo = await prisma.memo.findMany({
+        where: { userId: user.id },
+        orderBy: { position: 'asc' }
+      });
+      return res.status(200).json({ memos: sortedMemo });
     } catch (error) {
       return res.status(500).json(error);
     }
   };
+
   export const destroy = async (
     req: Request<{ memoId: string }, any, { user: VerifiedUser }>,
     res
