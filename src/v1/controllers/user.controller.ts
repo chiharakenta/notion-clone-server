@@ -23,7 +23,8 @@ namespace userController {
       return res
         .cookie('access_token', token, {
           httpOnly: true,
-          secure: NODE_ENV === 'production'
+          secure: NODE_ENV === 'production',
+          sameSite: 'none'
         })
         .status(201)
         .json({ user });
@@ -69,7 +70,8 @@ namespace userController {
       return res
         .cookie('access_token', token, {
           httpOnly: true,
-          secure: NODE_ENV === 'production'
+          secure: NODE_ENV === 'production',
+          sameSite: 'none'
         })
         .status(201)
         .json({ user });
