@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { AES, enc } from 'crypto-js';
 import { Handler, Request } from 'express';
 import { sign } from 'jsonwebtoken';
+import { cookieOptions } from '../constants/cookieOptions';
 import { NODE_ENV, SECRET_KEY, TOKEN_SECRET_KEY } from '../constants/env';
 import { UserType } from '../types/user.type';
 
@@ -20,14 +21,7 @@ namespace userController {
       const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
-      return res
-        .cookie('access_token', token, {
-          httpOnly: true,
-          secure: NODE_ENV === 'production',
-          sameSite: 'none'
-        })
-        .status(201)
-        .json({ user });
+      return res.cookie('access_token', token, cookieOptions).status(201).json({ user });
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -67,14 +61,7 @@ namespace userController {
       const token = sign({ id: user.id }, TOKEN_SECRET_KEY, {
         expiresIn: '24h'
       });
-      return res
-        .cookie('access_token', token, {
-          httpOnly: true,
-          secure: NODE_ENV === 'production',
-          sameSite: 'none'
-        })
-        .status(201)
-        .json({ user });
+      return res.cookie('access_token', token, cookieOptions).status(201).json({ user });
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -82,7 +69,7 @@ namespace userController {
 
   // ユーザーログアウトAPI
   export const logout: Handler = async (req, res) => {
-    res.clearCookie('access_token').status(204).json();
+    res.clearCookie('access_token', cookieOptions).status(204).json();
   };
 }
 
